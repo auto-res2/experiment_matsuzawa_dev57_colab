@@ -6,5 +6,82 @@
     "low-bit dynamic quantization",
     "4-bit model compression",
     "quantization-aware inference"
+  ],
+  "research_study_list": [
+    {
+      "title": "Searching for Low-Bit Weights in Quantized Neural Networks"
+    },
+    {
+      "title": "Post-Training Sparsity-Aware Quantization"
+    },
+    {
+      "title": "Differentiable Dynamic Quantization with Mixed Precision and Adaptive Resolution"
+    },
+    {
+      "title": "Toward Accurate Post-Training Quantization for Image Super Resolution"
+    },
+    {
+      "title": "Accurate Neural Training with 4-bit Matrix Multiplications at Standard Formats"
+    },
+    {
+      "title": "Training Transformers with 4-bit Integers"
+    },
+    {
+      "title": "Searching for Low-Bit Weights in Quantized Neural Networks"
+    },
+    {
+      "title": "Ultra-Low Precision 4-bit Training of Deep Neural Networks"
+    },
+    {
+      "title": "Ultra-Low Precision 4-bit Training of Deep Neural Networks"
+    },
+    {
+      "title": "Accurate Neural Training with 4-bit Matrix Multiplications at Standard Formats"
+    },
+    {
+      "title": "2DQuant: Low-bit Post-Training Quantization for Image Super-Resolution"
+    },
+    {
+      "title": "Searching for Low-Bit Weights in Quantized Neural Networks"
+    },
+    {
+      "title": "QuantSR: Accurate Low-bit Quantization for Efficient Image Super-Resolution"
+    },
+    {
+      "title": "Differentiable Dynamic Quantization with Mixed Precision and Adaptive Resolution"
+    },
+    {
+      "title": "Temporal Dynamic Quantization for Diffusion Models"
+    },
+    {
+      "title": "Training Transformers with 4-bit Integers"
+    },
+    {
+      "title": "Memory Efficient Optimizers with 4-bit States"
+    },
+    {
+      "title": "Training with Quantization Noise for Extreme Model Compression"
+    },
+    {
+      "title": "Ultra-Low Precision 4-bit Training of Deep Neural Networks"
+    },
+    {
+      "title": "Ultra-Low Precision 4-bit Training of Deep Neural Networks"
+    },
+    {
+      "title": "Qu-ANTI-zation: Exploiting Quantization Artifacts for Achieving Adversarial Outcomes"
+    },
+    {
+      "title": "Post-Training Sparsity-Aware Quantization"
+    },
+    {
+      "title": "Temporal Dynamic Quantization for Diffusion Models"
+    },
+    {
+      "title": "A2Q+: Improving Accumulator-Aware Weight Quantization"
+    },
+    {
+      "title": "Robust Quantization: One Model to Rule Them All"
+    }
   ]
 }
