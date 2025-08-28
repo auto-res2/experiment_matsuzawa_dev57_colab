@@ -195,7 +195,7 @@ def plot_latency(baseline_s, iaq_s, out_dir, filename='inference_latency.pdf'):
     plt.close()
 
 
-def experiment1_accuracy_efficiency(model, calib_loader, val_loader, device='cpu', K=4, num_classes=10, weight_bits=4, act_bits=4, out_dir='.research/iteration3/images'):
+def experiment1_accuracy_efficiency(model, calib_loader, val_loader, device='cpu', K=4, num_classes=10, weight_bits=4, act_bits=4, out_dir='.research/iteration4/images'):
     print('Experiment 1: Building target modules...')
     modules = find_target_modules(model)
     print(f'Found {len(modules)} modules to quantize (Conv/Linear).')
@@ -220,10 +220,11 @@ def experiment1_accuracy_efficiency(model, calib_loader, val_loader, device='cpu
     # Quantize weights statically for all 4-bit variants
     model_s4 = copy.deepcopy(model)
     quantize_model_weights_inplace(model_s4, num_bits=weight_bits)
+    modules_s4 = find_target_modules(model_s4)
 
     # Static 4-bit (minmax)
-    scales_minmax, unsigned_minmax = static_scales_from_calibration(model_s4, calib_loader, modules, device=device, mode='minmax', num_bits=act_bits)
-    shims_minmax = [StaticPTQShim(modules[i], scales_minmax[i], unsigned_minmax[i], num_bits=act_bits) for i in range(len(modules))]
+    scales_minmax, unsigned_minmax = static_scales_from_calibration(model_s4, calib_loader, modules_s4, device=device, mode='minmax', num_bits=act_bits)
+    shims_minmax = [StaticPTQShim(modules_s4[i], scales_minmax[i], unsigned_minmax[i], num_bits=act_bits) for i in range(len(modules_s4))]
     t0 = time.time()
     acc_s4_minmax = evaluate_accuracy(model_s4, val_loader, device=device)
     t_s4_minmax = time.time() - t0
@@ -231,8 +232,8 @@ def experiment1_accuracy_efficiency(model, calib_loader, val_loader, device='cpu
         s.remove()
 
     # Static 4-bit (p99)
-    scales_p99, unsigned_p99 = static_scales_from_calibration(model_s4, calib_loader, modules, device=device, mode='p99', num_bits=act_bits)
-    shims_p99 = [StaticPTQShim(modules[i], scales_p99[i], unsigned_p99[i], num_bits=act_bits) for i in range(len(modules))]
+    scales_p99, unsigned_p99 = static_scales_from_calibration(model_s4, calib_loader, modules_s4, device=device, mode='p99', num_bits=act_bits)
+    shims_p99 = [StaticPTQShim(modules_s4[i], scales_p99[i], unsigned_p99[i], num_bits=act_bits) for i in range(len(modules_s4))]
     t0 = time.time()
     acc_s4_p99 = evaluate_accuracy(model_s4, val_loader, device=device)
     t_s4_p99 = time.time() - t0
@@ -240,7 +241,7 @@ def experiment1_accuracy_efficiency(model, calib_loader, val_loader, device='cpu
         s.remove()
 
     # Dynamic Percentile (baseline)
-    dyn_shims = [DynamicPercentileShim(modules[i], unsigned=unsigned_p99[i], num_bits=act_bits) for i in range(len(modules))]
+    dyn_shims = [DynamicPercentileShim(modules_s4[i], unsigned=unsigned_p99[i], num_bits=act_bits) for i in range(len(modules_s4))]
     t0 = time.time()
     acc_dyn = evaluate_accuracy(model_s4, val_loader, device=device)
     t_dyn = time.time() - t0
@@ -249,10 +250,10 @@ def experiment1_accuracy_efficiency(model, calib_loader, val_loader, device='cpu
 
     # IAQ-4: build codebooks and LUTs from calibration
     print('Experiment 1: Calibrating IAQ-4 (histograms/codebooks/LUTs)...')
-    per_mod, codebooks, luts = build_iaq4(model_s4, calib_loader, modules, K=K, device=device, max_samples_per_mod=24)
+    per_mod, codebooks, luts = build_iaq4(model_s4, calib_loader, modules_s4, K=K, device=device, max_samples_per_mod=24)
 
     # Install IAQ-4 shims
-    iaq_shims = [IAQ4Shim(modules[i], codebooks[i], luts[i]) for i in range(len(modules))]
+    iaq_shims = [IAQ4Shim(modules_s4[i], codebooks[i], luts[i]) for i in range(len(modules_s4))]
     t0 = time.time()
     acc_iaq = evaluate_accuracy(model_s4, val_loader, device=device)
     t_iaq = time.time() - t0
@@ -297,22 +298,23 @@ def experiment1_accuracy_efficiency(model, calib_loader, val_loader, device='cpu
         'overhead_model': overhead,
         'latency_wallclock_s': {'fp32': t_fp32, 'iaq4': t_iaq},
         'bits_by_bs': bits_by_bs,
-        'modules': modules,
+        'modules': modules_s4,
         'codebooks': codebooks,
         'luts': luts
     }
 
 
-def experiment2_robustness(model, calib_loader, val_loader, device='cpu', K=4, num_classes=10, act_bits=4, out_dir='.research/iteration3/images'):
+def experiment2_robustness(model, calib_loader, val_loader, device='cpu', K=4, num_classes=10, act_bits=4, out_dir='.research/iteration4/images'):
     modules = find_target_modules(model)
     # Weight quantization for 4-bit flows
     model_q = copy.deepcopy(model)
     quantize_model_weights_inplace(model_q, num_bits=4)
+    modules_q = find_target_modules(model_q)
 
     # IAQ-4 build
     print('Experiment 2: Calibrating IAQ-4...')
-    _, codebooks, luts = build_iaq4(model_q, calib_loader, modules, K=K, device=device)
-    iaq_shims = [IAQ4Shim(modules[i], codebooks[i], luts[i]) for i in range(len(modules))]
+    _, codebooks, luts = build_iaq4(model_q, calib_loader, modules_q, K=K, device=device)
+    iaq_shims = [IAQ4Shim(modules_q[i], codebooks[i], luts[i]) for i in range(len(modules_q))]
 
     # Corruptions: gaussian_noise, blur, brightness (severities 1..5)
     base_ds = val_loader.dataset
@@ -356,7 +358,7 @@ def experiment2_robustness(model, calib_loader, val_loader, device='cpu', K=4, n
     return {'mean_acc_corruptions': mean_acc, 'gain_to_acc': gain_to_acc}
 
 
-def experiment3_ablation(model, calib_loader, val_loader, device='cpu', Ks=(2, 4, 8), fingerprint_bits=(4, 6), num_classes=10, out_dir='.research/iteration3/images'):
+def experiment3_ablation(model, calib_loader, val_loader, device='cpu', Ks=(2, 4, 8), fingerprint_bits=(4, 6), num_classes=10, out_dir='.research/iteration4/images'):
     # Weight quantization
     model_q = copy.deepcopy(model)
     quantize_model_weights_inplace(model_q, num_bits=4)

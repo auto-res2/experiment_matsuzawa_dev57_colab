@@ -224,10 +224,11 @@ def collect_calibration(model, calib_loader, modules, device='cpu', max_samples_
                 if len(per_mod[mi]['samples']) < max_samples_per_mod:
                     xs = x.detach().float().cpu()
                     if xs.dim() == 4:
-                        c = min(xs.size(1), 8)
-                        xs = xs[:1, :c, :min(14, xs.size(2)), :min(14, xs.size(3))].contiguous()
+                        # Preserve channel count to match Conv2d in_channels
+                        xs = xs[:1, :, :min(14, xs.size(2)), :min(14, xs.size(3))].contiguous()
                     elif xs.dim() == 2:
-                        xs = xs[:1, :min(512, xs.size(1))]
+                        # Preserve feature dimension to match Linear in_features
+                        xs = xs[:1, :]
                     per_mod[mi]['samples'].append(xs)
 
     for t in taps:
