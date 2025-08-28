@@ -1,0 +1,33 @@
+Static scales:   0%|          | 0/4 [00:00<?, ?it/s]                                                    Static scales:   0%|          | 0/4 [00:00<?, ?it/s]                                                    Calibrating:   0%|          | 0/4 [00:00<?, ?it/s]                                                  Calibrating:   0%|          | 0/4 [00:00<?, ?it/s]Calibrating: 100%|██████████| 4/4 [00:00<00:00, 35.90it/s]                                                          Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/runner/work/experiment_matsuzawa_dev57_colab/experiment_matsuzawa_dev57_colab/src/main.py", line 127, in <module>
+    main()
+  File "/home/runner/work/experiment_matsuzawa_dev57_colab/experiment_matsuzawa_dev57_colab/src/main.py", line 84, in main
+    _, codebooks, luts = build_iaq4(model_iaq, calib_loader, modules, K=cfg.get('iaq4', {}).get('K', 4), device=device)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/experiment_matsuzawa_dev57_colab/experiment_matsuzawa_dev57_colab/src/preprocess.py", line 346, in build_iaq4
+    cb, lut = build_codebook_for_module(model, modules[mi], mi, per_mod[mi], K=K, device=device)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/experiment_matsuzawa_dev57_colab/experiment_matsuzawa_dev57_colab/src/preprocess.py", line 296, in build_codebook_for_module
+    y_fp = [run_module(module, xs) for xs in xs_list_dev]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/experiment_matsuzawa_dev57_colab/experiment_matsuzawa_dev57_colab/src/preprocess.py", line 296, in <listcomp>
+    y_fp = [run_module(module, xs) for xs in xs_list_dev]
+            ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/experiment_matsuzawa_dev57_colab/experiment_matsuzawa_dev57_colab/src/preprocess.py", line 273, in run_module
+    return m(x)
+           ^^^^
+  File "/home/runner/work/_tool/Python/3.11.13/x64/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/_tool/Python/3.11.13/x64/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/_tool/Python/3.11.13/x64/lib/python3.11/site-packages/torch/nn/modules/conv.py", line 548, in forward
+    return self._conv_forward(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/work/_tool/Python/3.11.13/x64/lib/python3.11/site-packages/torch/nn/modules/conv.py", line 543, in _conv_forward
+    return F.conv2d(
+           ^^^^^^^^^
+RuntimeError: Given groups=1, weight of size [32, 16, 3, 3], expected input[1, 8, 14, 14] to have 16 channels, but got 8 channels instead
