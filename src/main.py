@@ -33,10 +33,10 @@ def main():
             'training': {'enable': True, 'steps': 50, 'lr': 1e-3},
             'evaluation': {'batch_eval': 64},
             'iaq4': {'K': 4},
-            'output_dir': '.research/iteration2/images'
+            'output_dir': '.research/iteration3/images'
         }
 
-    out_dir = cfg.get('output_dir', '.research/iteration2/images')
+    out_dir = cfg.get('output_dir', '.research/iteration3/images')
     os.makedirs(out_dir, exist_ok=True)
 
     set_seed(cfg.get('seed', 123))

@@ -312,7 +312,10 @@ def build_codebook_for_module(model, module, mod_idx, per_mod_entry, K=4, device
 
     votes = np.zeros((64, K), dtype=np.int32)
     for b in range(H.shape[0]):
-        am, p = per_mod_entry['abs_mean'][b], per_mod_entry['p99'][b] if b < len(per_mod_entry['p99']) else (per_mod_entry['p99'][-1] if len(per_mod_entry['p99']) > 0 else 1.0)
+        am_list = per_mod_entry['abs_mean']
+        p99_list = per_mod_entry['p99']
+        am = am_list[b] if b < len(am_list) else (am_list[-1] if len(am_list) > 0 else 1.0)
+        p = p99_list[b] if b < len(p99_list) else (p99_list[-1] if len(p99_list) > 0 else 1.0)
         fp = fingerprint6(am, p)
         lab = labels[b]
         votes[fp, lab] += 1

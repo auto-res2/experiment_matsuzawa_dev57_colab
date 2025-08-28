@@ -195,7 +195,7 @@ def plot_latency(baseline_s, iaq_s, out_dir, filename='inference_latency.pdf'):
     plt.close()
 
 
-def experiment1_accuracy_efficiency(model, calib_loader, val_loader, device='cpu', K=4, num_classes=10, weight_bits=4, act_bits=4, out_dir='.research/iteration2/images'):
+def experiment1_accuracy_efficiency(model, calib_loader, val_loader, device='cpu', K=4, num_classes=10, weight_bits=4, act_bits=4, out_dir='.research/iteration3/images'):
     print('Experiment 1: Building target modules...')
     modules = find_target_modules(model)
     print(f'Found {len(modules)} modules to quantize (Conv/Linear).')
@@ -303,7 +303,7 @@ def experiment1_accuracy_efficiency(model, calib_loader, val_loader, device='cpu
     }
 
 
-def experiment2_robustness(model, calib_loader, val_loader, device='cpu', K=4, num_classes=10, act_bits=4, out_dir='.research/iteration2/images'):
+def experiment2_robustness(model, calib_loader, val_loader, device='cpu', K=4, num_classes=10, act_bits=4, out_dir='.research/iteration3/images'):
     modules = find_target_modules(model)
     # Weight quantization for 4-bit flows
     model_q = copy.deepcopy(model)
@@ -356,7 +356,7 @@ def experiment2_robustness(model, calib_loader, val_loader, device='cpu', K=4, n
     return {'mean_acc_corruptions': mean_acc, 'gain_to_acc': gain_to_acc}
 
 
-def experiment3_ablation(model, calib_loader, val_loader, device='cpu', Ks=(2, 4, 8), fingerprint_bits=(4, 6), num_classes=10, out_dir='.research/iteration2/images'):
+def experiment3_ablation(model, calib_loader, val_loader, device='cpu', Ks=(2, 4, 8), fingerprint_bits=(4, 6), num_classes=10, out_dir='.research/iteration3/images'):
     # Weight quantization
     model_q = copy.deepcopy(model)
     quantize_model_weights_inplace(model_q, num_bits=4)
