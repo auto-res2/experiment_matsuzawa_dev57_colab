@@ -14,4 +14,4 @@ evaluation:
   batch_eval: 64
 iaq4:
   K: 4
-output_dir: .research/iteration1/images
+output_dir: .research/iteration2/images

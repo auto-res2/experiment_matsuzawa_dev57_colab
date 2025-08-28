@@ -6,7 +6,7 @@ import torch
 import torch.nn.functional as F
 
 
-def quick_train(model, train_loader, device='cpu', iters=50, lr=1e-3, out_dir='.research/iteration1/images'):
+def quick_train(model, train_loader, device='cpu', iters=50, lr=1e-3, out_dir='.research/iteration2/images'):
     """A short warm-up training run to make FakeData non-degenerate.
     Saves training loss curve as a high-quality PDF.
     """

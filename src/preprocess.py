@@ -274,7 +274,14 @@ def build_codebook_for_module(model, module, mod_idx, per_mod_entry, K=4, device
 
     for k in range(K):
         members = batches_by_centroid.get(k, [])
-        anchor = float(np.median([p99s[i] for i in members])) if len(members) else float(np.median(p99s)) if len(p99s) > 0 else 1.0
+        if len(p99s) > 0:
+            if len(members) > 0:
+                sel = [p99s[i] for i in members if i < len(p99s)]
+                anchor = float(np.median(sel)) if len(sel) > 0 else float(np.median(p99s))
+            else:
+                anchor = float(np.median(p99s))
+        else:
+            anchor = 1.0
         grid = choose_clip_grid(anchor, num_candidates=40, low=0.6, high=1.4)
 
         xs_list = per_mod_entry['samples'][:12] if len(per_mod_entry['samples']) > 0 else []
@@ -305,7 +312,7 @@ def build_codebook_for_module(model, module, mod_idx, per_mod_entry, K=4, device
 
     votes = np.zeros((64, K), dtype=np.int32)
     for b in range(H.shape[0]):
-        am, p = per_mod_entry['abs_mean'][b], per_mod_entry['p99'][b]
+        am, p = per_mod_entry['abs_mean'][b], per_mod_entry['p99'][b] if b < len(per_mod_entry['p99']) else (per_mod_entry['p99'][-1] if len(per_mod_entry['p99']) > 0 else 1.0)
         fp = fingerprint6(am, p)
         lab = labels[b]
         votes[fp, lab] += 1
