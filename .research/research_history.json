@@ -511,6 +511,68 @@
       }
     }
   ],
+  "reference_research_study_list": [
+    {
+      "title": "Post training 4-bit quantization of convolutional networks for rapid-deployment"
+    },
+    {
+      "title": "cuDNN: Efﬁcient primitives for deep learning"
+    },
+    {
+      "title": "PACT: Parameterized clipping activation for quantized neural networks"
+    },
+    {
+      "title": "Volta: Performance and programmability"
+    },
+    {
+      "title": "Low-bit quantization of neural networks for efﬁcient inference"
+    },
+    {
+      "title": "Post-training piecewise linear quantization for deep neural networks"
+    },
+    {
+      "title": "The architectural implications of facebook’s DNN-based personalized recommendation"
+    },
+    {
+      "title": "Deep residual learning for image recognition"
+    },
+    {
+      "title": "Densely connected convolutional networks"
+    },
+    {
+      "title": "Accurate post training quantization with small calibration sets"
+    },
+    {
+      "title": "Squeezenet: Alexnet-level accuracy with 50x fewer parameters and< 0.5 mb model size"
+    },
+    {
+      "title": "BiScaled-DNN: Quantizing long-tailed datastructures with two scale factors for deep neural networks"
+    },
+    {
+      "title": "Dissecting the NVIDIA Volta GPU architecture via microbenchmarking"
+    },
+    {
+      "title": "Quantizing deep convolutional networks for efﬁcient inference: A whitepaper"
+    },
+    {
+      "title": "Systolic arrays (for VLSI)"
+    },
+    {
+      "title": "BRECQ: Pushing the limit of post-training quantization by block reconstruction"
+    },
+    {
+      "title": "Lost in pruning: The effects of pruning neural networks beyond test accuracy"
+    },
+    {
+      "title": "Sparse systolic tensor array for efﬁcient CNN hardware acceleration"
+    },
+    {
+      "title": "NVIDIA tensor core programmability, performance & precision"
+    },
+    {
+      "title": "Accelerating sparse deep neural networks"
+    }
+  ],
   "new_method": {
     "method": "Open Problems: Static 4-bit post-training quantization (PTQ) fixes scale/zero-point per tensor before deployment. This ignores sample-to-sample variation of activation distributions that becomes critical when only 16 quantization levels are available, especially for mobile-friendly lightweight networks whose activations have high kurtosis and bursty outliers. Existing dynamic schemes (e.g., SPARQ, TDQ, DDQ) either 1) need extra metadata every activation (SPARQ), 2) are tied to special temporal cues like the diffusion time-step (TDQ), or 3) learn layer-wise mixed precision but still use static ranges at inference (DDQ). The unresolved challenge is: How can we select an input-aware 4-bit quantization range at inference that (a) costs virtually zero extra latency, (b) keeps metadata below 1 bit/activation, and (c) works for any CNN/Transformer without relying on temporal information? Solving this would close the accuracy gap between 8-bit and 4-bit PTQ while preserving the memory-bandwidth and GEMM-density advantages of pure INT4 hardware.\nMethods: We propose IAQ-4 (Input-Aware Quantization for 4-bit inference).\n1. Offline codebook distillation: For every layer we run the FP32 model over a calibration set and cluster its per-batch activation histograms into K centroids (K≤8). Each centroid stores an optimal (scale, zero-point) pair found by minimizing KL divergence to FP32 outputs under 4-bit clipping.\n2. Lightweight distribution fingerprint: At inference the hardware computes two cheap statistics per layer per batch – the mean of absolute activations |x|_avg and the 99th percentile estimate p99 (obtained with a 64-entry running histogram). These two numbers are encoded into a 6-bit fingerprint by logarithmic binning.\n3. Fingerprint-to-codebook mapping: A tiny 2-layer LUT-implanted MLP trained off-line maps the 6-bit fingerprint to a centroid index (⩽3 bits). Because 6-bit input and 3-bit output are small, the mapping is implemented as a 64-entry table that sits in SRAM and is queried in a single cycle.\n4. One-shot range selection: The chosen (scale, zero-point) is broadcast to all activations in the current mini-batch (or tile) before INT4 GEMM. No per-activation metadata is emitted; only one 15-bit header (scale:10, zero-point:5) per layer per batch is sent, amortising to <0.02 bits/activation for typical batch-sizes.\n5. Training-free fit: Because mapping and codebook are built from post-training statistics, IAQ-4 can be applied to any pretrained network without re-training. Optionally, a short 1-epoch LSQ fine-tuning can update centroids but is not required.\nNovelty vs prior work: Unlike SPARQ, IAQ-4 keeps the activation tensor layout intact and adds <0.02 bits/act metadata; unlike TDQ it does not depend on a particular domain-specific temporal variable; unlike DDQ it adapts at run-time rather than statically learning ranges. The fingerprint table makes range selection hardware-friendly and constant-time.\nExperimental Setup: Models: ResNet-50, MobileNetV2, DeiT-Small, and Swin-T on ImageNet-1K; plus CIFAR-100 ResNet-20 for ablation speed.\nBaselines: (1) FP32, (2) Static 8-bit PTQ (Min-Max), (3) Static 4-bit PTQ (PTQ4, LAPQ), (4) SPARQ-4bit, (5) DDQ-4bit.\nMetrics: Top-1 accuracy, latency (cycle-accurate simulator of INT4 GEMM + IAQ-4 logic), energy/bit, and added metadata bits/activation. Robustness tests on ImageNet-C (15 corruption types, 5 severities) and validation under ±20% dynamic range shift (synthetic gain noise).\nAblations: Vary codebook size K (2,4,8), fingerprint granularity (4-bit vs 6-bit), header amortisation with batch-size and tile size, and optional 1-epoch fine-tune.\nHardware prototype: FPGA RTL of the lookup + header broadcast inserted before an open-source INT4 systolic array; measure critical path and LUT/BRAM overhead (<2%).\nResult: We expect IAQ-4 to recover 70–90 % of the accuracy drop between 8-bit and static 4-bit PTQ: e.g., ResNet-50 Top-1 rises from 73.1 % (static 4-bit) to 75.8 % (IAQ-4) versus 76.1 % for 8-bit. MobileNetV2 improves from 64.5 %→67.2 % (8-bit is 68.5 %). Robustness: average ImageNet-C accuracy improves by 4-5 pp over static 4-bit and matches 8-bit. Latency overhead is <0.5 % and metadata <0.02 bits/act, both far lower than SPARQ (0.5–1.0 bits/act). FPGA synthesis shows <1 % area increase and no frequency loss.\nConclusion: IAQ-4 demonstrates that a tiny, input-aware range selector can close most of the accuracy gap of aggressive 4-bit inference while keeping hardware overhead negligible. Academically, it extends the idea of temporal dynamic quantization to a general, domain-agnostic activation-aware setting and offers a new trade-off frontier between accuracy and hardware simplicity. Practically, IAQ-4 enables deployment of existing INT4 MAC arrays without firmware changes, requiring only a small pre-GEMM module and negligible metadata bandwidth. Future directions include extending the fingerprint to channel-group granularity for even finer adaptation, integrating IAQ-4 with mixed-precision (DDQ) policies, and exploring adaptive codebooks that evolve on-device via federated telemetry.",
     "experimental_design": {
