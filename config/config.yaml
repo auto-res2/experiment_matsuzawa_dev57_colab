@@ -1,0 +1,17 @@
+seed: 123
+device: auto
+dataset: fake
+image_size: 32
+num_classes: 10
+calibration:
+  n_calib: 128
+  batch_calib: 32
+training:
+  enable: true
+  steps: 50
+  lr: 0.001
+evaluation:
+  batch_eval: 64
+iaq4:
+  K: 4
+output_dir: .research/iteration1/images

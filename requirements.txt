@@ -1,1 +1,7 @@
-# Please list the required python packages.
+torch>=2.1.0
+torchvision>=0.16.0
+numpy>=1.23.0
+matplotlib>=3.7.0
+tqdm>=4.66.0
+PyYAML>=6.0.0
+Pillow>=10.0.0
